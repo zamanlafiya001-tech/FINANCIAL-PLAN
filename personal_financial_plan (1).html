@@ -1,0 +1,1736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PERSONAL FINANCIAL PLAN — Formula A</title>
+  <!-- Load Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Load Google Fonts: Plus Jakarta Sans & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+          },
+          boxShadow: {
+            card: '0 4px 20px -2px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04)',
+            'card-hover': '0 14px 30px -4px rgba(15, 23, 42, 0.14), 0 4px 12px -2px rgba(15, 23, 42, 0.06)',
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    /* Custom subtle geometric patterns inside card banners to mirror reference image */
+    .banner-pattern-1 {
+      background: linear-gradient(135deg, #1d75f2 0%, #2b8eff 50%, #1660d6 100%);
+    }
+    .banner-pattern-2 {
+      background: linear-gradient(135deg, #061c3d 0%, #0b2d5e 60%, #05152e 100%);
+    }
+    .banner-pattern-3 {
+      background: linear-gradient(135deg, #164ea6 0%, #1f66d1 55%, #0e377a 100%);
+    }
+    .banner-pattern-4 {
+      background: linear-gradient(135deg, #0d1b3e 0%, #162b5c 60%, #09132c 100%);
+    }
+    .banner-pattern-5 {
+      background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 55%, #1e40af 100%);
+    }
+    .banner-pattern-6 {
+      background: linear-gradient(135deg, #121c38 0%, #1c2c54 60%, #0b1224 100%);
+    }
+
+    /* Smooth modal transitions */
+    .modal-backdrop {
+      transition: opacity 0.2s ease-out;
+    }
+    .modal-panel {
+      transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease-out;
+    }
+  </style>
+</head>
+<body class="bg-white text-slate-900 antialiased selection:bg-blue-600 selection:text-white min-h-screen">
+  <!-- Main Page Container -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+    
+    <!-- Header Section matching reference image -->
+    <header class="text-center mb-8 sm:mb-10">
+      <h1 class="font-display font-extrabold text-3xl sm:text-4xl md:text-[42px] tracking-tight text-slate-950 uppercase leading-none">
+        PERSONAL FINANCIAL PLAN
+      </h1>
+      <p class="mt-2.5 text-sm sm:text-base text-slate-500 font-medium">
+        Formula A — Percentage-Based Monthly Salary Allocation &bull; <span class="text-blue-600 font-semibold">100% Structured</span>
+      </p>
+
+      <!-- Action Toolbar: Record Transaction, View Switcher & Optional Naira Calculator -->
+      <div class="mt-6 flex flex-col md:flex-row items-center justify-center gap-3 flex-wrap">
+        <!-- Primary Record Transaction Button -->
+        <button
+          type="button"
+          onclick="openTransactionModal()"
+          class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-sm transition-all cursor-pointer"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+          </svg>
+          Record Transaction &amp; Receipt
+        </button>
+
+        <!-- Segmented Toggle: % View Only vs Naira + % Calculator -->
+        <div class="inline-flex items-center p-1 bg-slate-100 rounded-xl border border-slate-200/80 shadow-xs" role="group" aria-label="Display Mode">
+          <button
+            id="btnModePercent"
+            type="button"
+            onclick="setDisplayMode('percent')"
+            class="px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all bg-white text-slate-900 shadow-xs cursor-pointer"
+          >
+            % View Only
+          </button>
+          <button
+            id="btnModeCalculator"
+            type="button"
+            onclick="setDisplayMode('calculator')"
+            class="px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all text-slate-600 hover:text-slate-900 cursor-pointer"
+          >
+            &#8358; + % Calculator View
+          </button>
+        </div>
+
+        <!-- Expandable Naira Salary Input (Shown in Calculator Mode) -->
+        <div
+          id="calculatorInputBar"
+          class="hidden items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-1.5 shadow-xs transition-all"
+        >
+          <label for="salaryInput" class="text-xs font-semibold text-slate-600 whitespace-nowrap">
+            Target Salary (&#8358;):
+          </label>
+          <div class="relative flex items-center">
+            <span class="text-slate-400 font-semibold text-sm mr-1">&#8358;</span>
+            <input
+              id="salaryInput"
+              type="text"
+              inputmode="numeric"
+              value="250,000"
+              aria-label="Monthly Salary in Naira"
+              class="w-28 sm:w-32 bg-white border border-slate-300 rounded-lg px-2.5 py-1 text-sm font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <span class="hidden md:inline-block text-[11px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
+            100% Allocated
+          </span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Live Dashboard Summary Strip -->
+    <section aria-label="Financial Summary" class="mb-8">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+        <div class="bg-slate-50/90 border border-slate-200/80 rounded-xl p-4 shadow-xs">
+          <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Salary Logged</p>
+          <p id="kpiTotalSalary" class="mt-1 font-display text-lg sm:text-xl font-extrabold text-slate-900">&#8358;0</p>
+          <p class="mt-0.5 text-[11px] text-slate-500">Auto-split inflows</p>
+        </div>
+        <div class="bg-slate-50/90 border border-slate-200/80 rounded-xl p-4 shadow-xs">
+          <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Allocated / In</p>
+          <p id="kpiTotalAllocated" class="mt-1 font-display text-lg sm:text-xl font-extrabold text-blue-700">&#8358;0</p>
+          <p class="mt-0.5 text-[11px] text-slate-500">Across all 6 accounts</p>
+        </div>
+        <div class="bg-slate-50/90 border border-slate-200/80 rounded-xl p-4 shadow-xs">
+          <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Expenses / Outflows</p>
+          <p id="kpiTotalSpent" class="mt-1 font-display text-lg sm:text-xl font-extrabold text-rose-600">&#8358;0</p>
+          <p class="mt-0.5 text-[11px] text-slate-500">Disbursed &amp; spent</p>
+        </div>
+        <div class="bg-slate-50/90 border border-slate-200/80 rounded-xl p-4 shadow-xs">
+          <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Net Available Balance</p>
+          <p id="kpiNetBalance" class="mt-1 font-display text-lg sm:text-xl font-extrabold text-emerald-700">&#8358;0</p>
+          <p class="mt-0.5 text-[11px] text-slate-500">Remaining across accounts</p>
+        </div>
+        <div class="col-span-2 sm:col-span-1 bg-slate-50/90 border border-slate-200/80 rounded-xl p-4 shadow-xs">
+          <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Receipts Archived</p>
+          <p id="kpiReceiptsCount" class="mt-1 font-display text-lg sm:text-xl font-extrabold text-slate-900">0</p>
+          <p class="mt-0.5 text-[11px] text-slate-500">Proof of transfer / spend</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4-Column Responsive Card Grid (4 on top row, 2 on bottom row on lg+) -->
+    <main>
+      <div id="planGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+        <!-- Cards are injected dynamically via JavaScript for clean state sync -->
+      </div>
+    </main>
+
+    <!-- Transaction History & Receipt Ledger Section -->
+    <section aria-label="Transaction History and Receipts" class="mt-12 bg-white border border-slate-200/90 rounded-2xl shadow-card overflow-hidden">
+      <div class="p-5 sm:p-6 border-b border-slate-100 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div>
+          <h2 class="font-display text-lg sm:text-xl font-extrabold text-slate-900">
+            Transaction History &amp; Receipt Ledger
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+            Track inflows, Formula A auto-splits, expenses, and attached payment receipts across all 6 bank accounts.
+          </p>
+        </div>
+
+        <!-- Filters & Export Actions -->
+        <div class="flex flex-wrap items-center gap-2.5">
+          <input
+            id="ledgerSearch"
+            type="text"
+            placeholder="Search narration or bank..."
+            oninput="renderLedger()"
+            class="px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 w-44 sm:w-52"
+          />
+          <select
+            id="ledgerFilterPillar"
+            onchange="renderLedger()"
+            class="px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+          >
+            <option value="all">All Accounts (6)</option>
+            <option value="family">1. Family (Access)</option>
+            <option value="personal">2. Personal (Opay)</option>
+            <option value="debt">3. Debt (Wema Bank)</option>
+            <option value="savings">4. Savings &amp; Rentals (Polaris)</option>
+            <option value="charity">5. Charity (Opay)</option>
+            <option value="enterprise">6. Enterprises (Opay)</option>
+          </select>
+          <select
+            id="ledgerFilterType"
+            onchange="renderLedger()"
+            class="px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+          >
+            <option value="all">All Types</option>
+            <option value="inflow">Inflows / Allocations</option>
+            <option value="expense">Expenses / Outflows</option>
+          </select>
+          <button
+            type="button"
+            onclick="exportLedgerCSV()"
+            class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors cursor-pointer"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
+            </svg>
+            Export CSV
+          </button>
+        </div>
+      </div>
+
+      <!-- Responsive Table Container -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-50/80 border-b border-slate-200/80 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              <th class="py-3.5 px-4 sm:px-6">Date</th>
+              <th class="py-3.5 px-4">Pillar &amp; Designated Account</th>
+              <th class="py-3.5 px-4">Description / Narration</th>
+              <th class="py-3.5 px-4">Type</th>
+              <th class="py-3.5 px-4 text-right">Amount (&#8358;)</th>
+              <th class="py-3.5 px-4 text-center">Receipt</th>
+              <th class="py-3.5 px-4 sm:px-6 text-right">Action</th>
+            </tr>
+          </thead>
+          <tbody id="ledgerTableBody" class="divide-y divide-slate-100 text-sm text-slate-700">
+            <!-- Rows injected dynamically -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty State -->
+      <div id="ledgerEmptyState" class="hidden py-12 px-6 text-center">
+        <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-3">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+        </div>
+        <h3 class="font-bold text-slate-900 text-sm sm:text-base">No transactions recorded yet</h3>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1 max-w-md mx-auto">
+          Log your monthly salary to automatically split funds across your 5 salary accounts, or record a direct deposit/expense with a receipt.
+        </p>
+        <button
+          type="button"
+          onclick="openTransactionModal()"
+          class="mt-4 inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold rounded-xl transition-colors cursor-pointer"
+        >
+          + Record First Transaction
+        </button>
+      </div>
+    </section>
+
+    <!-- Subtle Footer Summary -->
+    <footer class="mt-10 pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
+      <div class="flex items-center gap-2">
+        <span class="inline-block w-2 h-2 rounded-full bg-blue-600"></span>
+        <span>Formula A Allocation Total: <strong class="text-slate-600">35% + 20% + 20% + 20% + 5% = 100%</strong></span>
+      </div>
+      <div class="flex items-center gap-4">
+        <span>Data saved locally in your browser</span>
+        <button type="button" onclick="confirmClearData()" class="text-rose-500 hover:text-rose-600 font-semibold underline cursor-pointer">
+          Clear All Records
+        </button>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Toast Notification -->
+  <div
+    id="toastBanner"
+    class="fixed bottom-5 right-5 z-50 hidden items-center gap-2.5 bg-slate-900 text-white text-xs sm:text-sm font-semibold px-4 py-3 rounded-xl shadow-xl border border-slate-700 transition-all"
+  >
+    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+    <span id="toastMessage">Copied to clipboard</span>
+  </div>
+
+  <!-- Interactive Pillar Detail Modal -->
+  <div
+    id="detailModal"
+    class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/50 backdrop-blur-xs modal-backdrop opacity-0"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modalTitle"
+  >
+    <div
+      id="modalPanel"
+      class="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-slate-200 overflow-hidden transform scale-95 opacity-0 modal-panel"
+    >
+      <!-- Dynamic Colored Header Banner -->
+      <div id="modalBanner" class="banner-pattern-1 px-6 py-6 text-white relative">
+        <button
+          type="button"
+          onclick="closeModal()"
+          aria-label="Close modal"
+          class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center text-white transition-colors cursor-pointer"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        <p id="modalKicker" class="text-[11px] font-bold tracking-widest uppercase text-blue-100/90">
+          PILLAR 01 &bull; HOUSEHOLD WELFARE
+        </p>
+        <div class="mt-2 flex items-baseline justify-between gap-3">
+          <h2 id="modalTitle" class="font-display text-2xl font-extrabold tracking-tight">
+            Family Responsibility
+          </h2>
+          <span id="modalBadge" class="text-2xl sm:text-3xl font-extrabold bg-white/15 backdrop-blur-xs px-3 py-1 rounded-xl border border-white/20">
+            35%
+          </span>
+        </div>
+        <!-- Designated Bank Account Pill inside Modal -->
+        <div class="mt-3 inline-flex items-center gap-2 bg-black/25 px-3 py-1.5 rounded-lg border border-white/15 text-xs font-semibold">
+          <span id="modalBankDetails">1914060465 &bull; Access Bank</span>
+          <button
+            id="modalCopyBtn"
+            type="button"
+            class="text-blue-200 hover:text-white underline ml-1 cursor-pointer"
+          >
+            Copy
+          </button>
+        </div>
+        <p id="modalNairaLine" class="mt-2 text-xs font-semibold text-blue-100 hidden">
+          Target Monthly Allocation: <span id="modalNairaAmount" class="text-white font-bold">&#8358;87,500</span>
+        </p>
+      </div>
+
+      <!-- Modal Body Content -->
+      <div class="p-6 space-y-5">
+        <!-- Live Account Stats inside Modal -->
+        <div class="grid grid-cols-3 gap-2.5 bg-slate-50 p-3.5 rounded-xl border border-slate-200/80 text-center">
+          <div>
+            <p class="text-[10px] font-bold uppercase text-slate-400">Total In</p>
+            <p id="modalStatIn" class="text-sm font-extrabold text-blue-700 mt-0.5">&#8358;0</p>
+          </div>
+          <div class="border-x border-slate-200">
+            <p class="text-[10px] font-bold uppercase text-slate-400">Spent / Out</p>
+            <p id="modalStatOut" class="text-sm font-extrabold text-rose-600 mt-0.5">&#8358;0</p>
+          </div>
+          <div>
+            <p class="text-[10px] font-bold uppercase text-slate-400">Balance</p>
+            <p id="modalStatBal" class="text-sm font-extrabold text-emerald-700 mt-0.5">&#8358;0</p>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Strategic Mandate</h3>
+          <p id="modalSubtitle" class="mt-1 text-base font-bold text-slate-900">
+            Family Welfare &amp; Home Support
+          </p>
+          <p id="modalDescription" class="mt-2 text-sm text-slate-600 leading-relaxed">
+            Detailed explanation goes here.
+          </p>
+        </div>
+
+        <!-- Actionable Rules Checklist -->
+        <div class="bg-slate-50 rounded-xl p-4 border border-slate-200/70">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">
+            Execution &amp; Discipline Rules
+          </h4>
+          <ul id="modalRulesList" class="space-y-2.5 text-sm text-slate-700">
+            <!-- Rules injected here -->
+          </ul>
+        </div>
+
+        <!-- Bottom Action Row -->
+        <div class="flex items-center justify-between pt-1 gap-2">
+          <button
+            type="button"
+            onclick="logForActivePillar()"
+            class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold rounded-xl transition-colors cursor-pointer"
+          >
+            + Log Transaction Here
+          </button>
+          <button
+            type="button"
+            onclick="closeModal()"
+            class="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-semibold rounded-xl transition-colors cursor-pointer"
+          >
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Record Transaction & Upload Receipt Modal -->
+  <div
+    id="transactionModal"
+    class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs overflow-y-auto"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="txModalTitle"
+  >
+    <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-auto">
+      <div class="bg-slate-900 px-6 py-5 text-white flex items-center justify-between">
+        <div>
+          <p class="text-[11px] font-bold uppercase tracking-widest text-blue-400">Ledger &amp; Receipt Entry</p>
+          <h2 id="txModalTitle" class="font-display text-xl font-extrabold mt-0.5">Record Financial Transaction</h2>
+        </div>
+        <button
+          type="button"
+          onclick="closeTransactionModal()"
+          aria-label="Close transaction modal"
+          class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <form id="transactionForm" onsubmit="handleTransactionSubmit(event)" class="p-6 space-y-4">
+        <!-- Transaction Type -->
+        <div>
+          <label for="txType" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+            Transaction Type
+          </label>
+          <select
+            id="txType"
+            onchange="handleTxTypeChange()"
+            class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600"
+          >
+            <option value="salary_split">Monthly Salary Inflow (Auto-Split 35/20/20/20/5)</option>
+            <option value="deposit">Direct Account Deposit / Inflow</option>
+            <option value="expense">Expense / Disbursement (Outflow)</option>
+          </select>
+        </div>
+
+        <!-- Target Account Selector (Hidden when salary_split is chosen) -->
+        <div id="txAccountGroup" class="hidden">
+          <label for="txPillarId" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+            Designated Pillar &amp; Bank Account
+          </label>
+          <select
+            id="txPillarId"
+            class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600"
+          >
+            <option value="family">1. Family (35%) — 1914060465 • Access Bank</option>
+            <option value="personal">2. Personal (20%) — 8065628033 • Opay</option>
+            <option value="debt">3. Debt (20%) — 0127447432 • Wema Bank</option>
+            <option value="savings">4. Savings &amp; Rentals (20%) — 1767748423 • Polaris Bank</option>
+            <option value="charity">5. Charity (5%) — 8105898714 • Opay</option>
+            <option value="enterprise">6. Enterprises (100% Reinvested) — 08167676839 • Opay</option>
+          </select>
+        </div>
+
+        <!-- Live Auto-Split Preview Box (Shown when salary_split is chosen) -->
+        <div id="salarySplitPreview" class="bg-blue-50/70 border border-blue-200/80 rounded-xl p-3.5 text-xs space-y-1.5">
+          <p class="font-bold text-blue-900 uppercase tracking-wider text-[11px]">
+            Formula A Automatic Breakdown Preview:
+          </p>
+          <div id="splitPreviewList" class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-slate-700 font-medium">
+            <!-- Populated dynamically as amount is typed -->
+          </div>
+        </div>
+
+        <!-- Date & Amount Row -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div>
+            <label for="txDate" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+              Transaction Date
+            </label>
+            <input
+              id="txDate"
+              type="date"
+              required
+              class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600"
+            />
+          </div>
+          <div>
+            <label for="txAmount" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+              Amount (&#8358;)
+            </label>
+            <input
+              id="txAmount"
+              type="text"
+              inputmode="numeric"
+              required
+              placeholder="e.g. 250,000"
+              oninput="handleTxAmountInput(this)"
+              class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600"
+            />
+          </div>
+        </div>
+
+        <!-- Narration -->
+        <div>
+          <label for="txNote" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+            Description / Narration
+          </label>
+          <input
+            id="txNote"
+            type="text"
+            required
+            placeholder="e.g. November Salary Split / Access Bank Transfer / Cement Purchase"
+            class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600"
+          />
+        </div>
+
+        <!-- Receipt Upload Dropzone -->
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+            Upload Payment Receipt (Image or PDF — Optional)
+          </label>
+          <div
+            id="receiptDropzone"
+            onclick="document.getElementById('txReceiptFile').click()"
+            class="border-2 border-dashed border-slate-300 hover:border-blue-500 bg-slate-50 hover:bg-blue-50/40 rounded-xl p-4 text-center cursor-pointer transition-colors"
+          >
+            <input
+              id="txReceiptFile"
+              type="file"
+              accept="image/*,application/pdf"
+              onchange="handleReceiptFileSelect(event)"
+              class="hidden"
+            />
+            <div id="receiptPlaceholder">
+              <svg class="w-7 h-7 text-slate-400 mx-auto mb-1.5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+              </svg>
+              <p class="text-xs font-semibold text-slate-700">Click to attach transfer screenshot or receipt</p>
+              <p class="text-[11px] text-slate-400 mt-0.5">PNG, JPG, WEBP, or PDF (Max 3MB)</p>
+            </div>
+            <div id="receiptPreviewBox" class="hidden items-center justify-between gap-3 text-left">
+              <div class="flex items-center gap-3 min-w-0">
+                <img id="receiptThumbImg" src="" alt="Receipt preview" class="w-12 h-12 rounded-lg object-cover border border-slate-200 hidden" />
+                <div id="receiptPdfBadge" class="w-12 h-12 rounded-lg bg-rose-100 text-rose-700 font-extrabold text-xs items-center justify-center hidden">
+                  PDF
+                </div>
+                <div class="min-w-0">
+                  <p id="receiptFileName" class="text-xs font-bold text-slate-900 truncate">receipt.jpg</p>
+                  <p class="text-[11px] text-emerald-600 font-semibold">Ready to attach</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onclick="clearReceiptSelection(event)"
+                class="px-2.5 py-1 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-lg cursor-pointer"
+              >
+                Remove
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit Footer -->
+        <div class="pt-2 flex items-center justify-end gap-2.5">
+          <button
+            type="button"
+            onclick="closeTransactionModal()"
+            class="px-4 py-2.5 text-xs sm:text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-sm transition-colors cursor-pointer"
+          >
+            Save Transaction
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Hidden Input for Attaching Receipt to Existing Ledger Row -->
+  <input
+    id="quickAttachReceiptInput"
+    type="file"
+    accept="image/*,application/pdf"
+    onchange="handleQuickAttachReceipt(event)"
+    class="hidden"
+  />
+
+  <!-- Receipt Lightbox Preview Modal -->
+  <div
+    id="receiptLightboxModal"
+    class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xs"
+    role="dialog"
+    aria-modal="true"
+  >
+    <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
+      <div class="px-5 py-3.5 bg-slate-900 text-white flex items-center justify-between">
+        <div class="min-w-0 pr-4">
+          <h3 id="lightboxTitle" class="text-sm font-bold truncate">Payment Receipt</h3>
+          <p id="lightboxSubtitle" class="text-[11px] text-slate-400 truncate"></p>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <a
+            id="lightboxDownloadBtn"
+            href="#"
+            download="receipt"
+            class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-colors"
+          >
+            Download
+          </a>
+          <button
+            type="button"
+            onclick="closeReceiptLightbox()"
+            class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white cursor-pointer"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="p-4 bg-slate-100 flex items-center justify-center max-h-[75vh] overflow-auto">
+        <img id="lightboxImg" src="" alt="Uploaded Receipt" class="max-w-full max-h-[68vh] rounded-lg shadow-sm hidden" />
+        <iframe id="lightboxPdf" src="" title="PDF Receipt" class="w-full h-[68vh] rounded-lg border border-slate-300 hidden"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirmation Modal for Clearing Data -->
+  <div
+    id="confirmClearModal"
+    class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs"
+    role="dialog"
+    aria-modal="true"
+  >
+    <div class="bg-white w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-slate-200">
+      <h3 class="font-display text-lg font-extrabold text-slate-900">Clear All Transaction Records?</h3>
+      <p class="mt-2 text-xs sm:text-sm text-slate-600 leading-relaxed">
+        This will permanently remove all logged transactions, balances, and uploaded receipts from this browser.
+      </p>
+      <div class="mt-5 flex items-center justify-end gap-2.5">
+        <button
+          type="button"
+          onclick="closeClearModal()"
+          class="px-4 py-2 text-xs sm:text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-xl cursor-pointer"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          onclick="executeClearData()"
+          class="px-4 py-2 text-xs sm:text-sm font-bold bg-rose-600 hover:bg-rose-700 text-white rounded-xl cursor-pointer"
+        >
+          Yes, Clear All
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * Formula A Financial Plan Data + Designated Bank Accounts
+     */
+    const FINANCIAL_PILLARS = [
+      {
+        id: 'family',
+        kicker: 'PILLAR 01 • HOUSEHOLD WELFARE',
+        bannerTitle: 'Family Responsibility',
+        percentage: 35,
+        badgeText: '35%',
+        cardTitle: 'Family Responsibility',
+        subtitle: 'Family Welfare & Home Support',
+        accountNumber: '1914060465',
+        bankName: 'Access Bank',
+        rating: '5.0/5',
+        priorityTag: '(Core)',
+        bottomNote: 'Automated payday transfer • Covers household needs',
+        bannerClass: 'banner-pattern-1',
+        svgPattern: 'circles',
+        description:
+          'Dedicated strictly to core household upkeep, family welfare, provisions, and essential domestic obligations. By capping this at 35%, family needs are honored reliably without eroding personal stability or wealth creation.',
+        rules: [
+          'Execute an automated bank transfer to Access Bank (1914060465) immediately upon salary receipt.',
+          'Operate on a zero-based household budget—every Naira is assigned before spending.',
+          'Keep household funds separate from personal spending and enterprise accounts.',
+        ],
+      },
+      {
+        id: 'personal',
+        kicker: 'PILLAR 02 • AWAY-FROM-HOME LIVING',
+        bannerTitle: 'Personal Living & Upkeep',
+        percentage: 20,
+        badgeText: '20%',
+        cardTitle: 'Personal Living & Upkeep',
+        subtitle: 'Personal Expenses & Drip-Cost Control',
+        accountNumber: '8065628033',
+        bankName: 'Opay',
+        rating: '4.9/5',
+        priorityTag: '(Strict)',
+        bottomNote: 'Zero-based cap • Cut phone & recurring drips',
+        bannerClass: 'banner-pattern-2',
+        svgPattern: 'grid',
+        description:
+          'Covers day-to-day away-from-home living, transit, meals, and personal essentials under a strict zero-based ceiling in Opay (8065628033). Designed to eliminate silent financial leaks ("drip" expenses).',
+        rules: [
+          'Audit and eliminate recurring "drip" expenses (unused data plans, impulse airtime, micro-subscriptions).',
+          'Once the 20% personal allocation in Opay (8065628033) is exhausted, discretionary spending stops.',
+          'Never borrow from Savings (20%) or Debt Settlement (20%) to subsidize lifestyle creep.',
+        ],
+      },
+      {
+        id: 'debt',
+        kicker: 'PILLAR 03 • LIABILITY ELIMINATION',
+        bannerTitle: 'Debt Settlement',
+        percentage: 20,
+        badgeText: '20%',
+        cardTitle: 'Debt Settlement',
+        subtitle: 'Structured Debt Paydown',
+        accountNumber: '0127447432',
+        bankName: 'Wema Bank',
+        rating: '5.0/5',
+        priorityTag: '(Fixed)',
+        bottomNote: 'Fixed 20% clearance • Zero new liabilities',
+        bannerClass: 'banner-pattern-3',
+        svgPattern: 'rings',
+        description:
+          'A ring-fenced 20% monthly attack on existing liabilities routed through Wema Bank (0127447432) until full debt freedom is achieved. Once debts are cleared, this entire 20% stream redirects into Savings & Rentals.',
+        rules: [
+          'Transfer 20% into Wema Bank (0127447432) and pay down highest-priority obligations systematically.',
+          'Strict moratorium on taking on any new consumer loans or salary advances.',
+          'Upon 100% debt clearance, roll this 20% directly into Pillar 04 (accelerating wealth building to 40%).',
+        ],
+      },
+      {
+        id: 'savings',
+        kicker: 'PILLAR 04 • WEALTH & REAL ESTATE',
+        bannerTitle: 'Savings & Rental Asset Fund',
+        percentage: 20,
+        badgeText: '20%',
+        cardTitle: 'Savings & Rental Asset Fund',
+        subtitle: 'Pay-Yourself-First & Rental Property Build',
+        accountNumber: '1767748423',
+        bankName: 'Polaris Bank',
+        rating: '5.0/5',
+        priorityTag: '(Locked)',
+        bottomNote: 'Locked capital • Residential rental construction',
+        bannerClass: 'banner-pattern-4',
+        svgPattern: 'orbit',
+        description:
+          'Your non-negotiable Pay-Yourself-First wealth engine held in Polaris Bank (1767748423), specifically earmarked for acquiring land and constructing income-generating residential rental property.',
+        rules: [
+          'Transfer 20% to Polaris Bank (1767748423) first on payday before discretionary spending begins.',
+          'Capital is strictly locked for long-term real estate & residential rental property development.',
+          'Zero withdrawal access for routine consumption or short-term emergencies.',
+        ],
+      },
+      {
+        id: 'charity',
+        kicker: 'PILLAR 05 • SOCIAL IMPACT',
+        bannerTitle: 'Charity & Giving (Sadaqah)',
+        percentage: 5,
+        badgeText: '5%',
+        cardTitle: 'Charity & Giving (Sadaqah)',
+        subtitle: 'Dedicated Giving & Community Support',
+        accountNumber: '8105898714',
+        bankName: 'Opay',
+        rating: '5.0/5',
+        priorityTag: '(Off-Top)',
+        bottomNote: '5% off the top • Consistent monthly allocation',
+        bannerClass: 'banner-pattern-5',
+        svgPattern: 'waves',
+        description:
+          'A deliberate 5% allocation transferred immediately into Opay (8105898714) for Sadaqah, family assistance requests, and community support—ensuring generosity is sustainable and planned.',
+        rules: [
+          'Transfer 5% into Opay (8105898714) immediately upon receiving monthly income.',
+          'Use this pool to fulfill charitable commitments and ad-hoc support requests without disrupting core pillars.',
+          'Maintains spiritual discipline and consistent social impact every single month.',
+        ],
+      },
+      {
+        id: 'enterprise',
+        kicker: 'GOVERNANCE RULE • SEPARATE LEDGER',
+        bannerTitle: 'Enterprises Profit Pool',
+        percentage: null,
+        badgeText: '100% Reinvested',
+        cardTitle: 'Enterprises Profit Pool',
+        subtitle: 'Business Earnings Ring-Fenced',
+        accountNumber: '08167676839',
+        bankName: 'Opay',
+        rating: '5.0/5',
+        priorityTag: '(Rule)',
+        bottomNote: 'Strict separation • 100% retained for enterprise growth',
+        bannerClass: 'banner-pattern-6',
+        svgPattern: 'nodes',
+        description:
+          'A foundational governance firewall: personal living relies 100% on the salary formula above, while all enterprise revenue and profits remain strictly ring-fenced inside Opay (08167676839) for compounding growth.',
+        rules: [
+          'Zero commingling of business revenue/profits in Opay (08167676839) with personal household expenses.',
+          '100% of net enterprise profits are retained for inventory, operations, and business expansion.',
+          'Protects enterprise working capital from personal cashflow pressures.',
+        ],
+      },
+    ];
+
+    const STORAGE_KEY = 'formula_a_financial_ledger_v1';
+
+    // State
+    let displayMode = 'percent'; // 'percent' | 'calculator'
+    let monthlySalary = 250000;
+    let activePillarId = null;
+    let transactions = [];
+    let pendingReceiptData = null; // { name, type, dataUrl }
+    let quickAttachTxId = null;
+
+    /**
+     * Load persisted transactions from localStorage
+     */
+    function loadTransactions() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          transactions = JSON.parse(saved);
+        }
+      } catch (err) {
+        console.error('Failed to load transactions:', err);
+        transactions = [];
+      }
+    }
+
+    /**
+     * Save transactions to localStorage
+     */
+    function saveTransactions() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
+      } catch (err) {
+        showToast('Storage full: receipt image may be too large.');
+        console.error('Failed to save transactions:', err);
+      }
+    }
+
+    /**
+     * Format number as Nigerian Naira currency string
+     */
+    function formatNaira(amount) {
+      return '₦' + Math.round(amount).toLocaleString('en-NG');
+    }
+
+    /**
+     * Show brief toast notification
+     */
+    function showToast(msg) {
+      const toast = document.getElementById('toastBanner');
+      document.getElementById('toastMessage').textContent = msg;
+      toast.classList.remove('hidden');
+      toast.classList.add('flex');
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => {
+        toast.classList.add('hidden');
+        toast.classList.remove('flex');
+      }, 2800);
+    }
+
+    /**
+     * Copy account number to clipboard reliably
+     */
+    function copyAccountNumber(event, accountNumber, bankName) {
+      if (event) event.stopPropagation();
+      const tempInput = document.createElement('input');
+      tempInput.value = accountNumber;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempInput);
+      showToast(`Copied ${accountNumber} (${bankName})`);
+    }
+
+    /**
+     * Compute per-pillar & global financial stats
+     */
+    function computeFinancialSummary() {
+      const statsByPillar = {};
+      FINANCIAL_PILLARS.forEach((p) => {
+        statsByPillar[p.id] = { totalIn: 0, totalOut: 0, balance: 0 };
+      });
+
+      let totalSalaryLogged = 0;
+      let totalAllocatedIn = 0;
+      let totalSpentOut = 0;
+      let receiptsCount = 0;
+      const countedSplitBatches = new Set();
+
+      transactions.forEach((tx) => {
+        if (tx.receipt && tx.receipt.dataUrl) {
+          receiptsCount += 1;
+        }
+        if (tx.isSalarySplit && tx.batchId && !countedSplitBatches.has(tx.batchId)) {
+          countedSplitBatches.add(tx.batchId);
+          totalSalaryLogged += tx.batchTotalSalary || 0;
+        }
+        const bucket = statsByPillar[tx.pillarId];
+        if (!bucket) return;
+
+        if (tx.direction === 'inflow') {
+          bucket.totalIn += tx.amount;
+          totalAllocatedIn += tx.amount;
+        } else {
+          bucket.totalOut += tx.amount;
+          totalSpentOut += tx.amount;
+        }
+        bucket.balance = bucket.totalIn - bucket.totalOut;
+      });
+
+      return {
+        statsByPillar,
+        totalSalaryLogged,
+        totalAllocatedIn,
+        totalSpentOut,
+        netBalance: totalAllocatedIn - totalSpentOut,
+        receiptsCount,
+      };
+    }
+
+    /**
+     * Update top KPI dashboard cards
+     */
+    function updateDashboardSummary() {
+      const summary = computeFinancialSummary();
+      document.getElementById('kpiTotalSalary').textContent = formatNaira(summary.totalSalaryLogged);
+      document.getElementById('kpiTotalAllocated').textContent = formatNaira(summary.totalAllocatedIn);
+      document.getElementById('kpiTotalSpent').textContent = formatNaira(summary.totalSpentOut);
+      document.getElementById('kpiNetBalance').textContent = formatNaira(summary.netBalance);
+      document.getElementById('kpiReceiptsCount').textContent = summary.receiptsCount.toString();
+      return summary;
+    }
+
+    /**
+     * Generate decorative SVG background overlays matching the reference cards
+     */
+    function getBannerSvg(type) {
+      if (type === 'circles') {
+        return `
+          <svg class="absolute inset-0 w-full h-full opacity-20 pointer-events-none" viewBox="0 0 320 170" fill="none">
+            <circle cx="275" cy="30" r="65" fill="white" fill-opacity="0.25"/>
+            <circle cx="45" cy="145" r="55" fill="white" fill-opacity="0.18"/>
+            <circle cx="210" cy="130" r="24" stroke="white" stroke-width="1.5"/>
+          </svg>`;
+      }
+      if (type === 'grid') {
+        return `
+          <svg class="absolute inset-0 w-full h-full opacity-20 pointer-events-none" viewBox="0 0 320 170" fill="none">
+            <path d="M0 40H320M0 90H320M0 140H320M70 0V170M160 0V170M250 0V170" stroke="white" stroke-width="0.8"/>
+            <circle cx="250" cy="40" r="18" stroke="white" stroke-width="1.5"/>
+          </svg>`;
+      }
+      if (type === 'rings') {
+        return `
+          <svg class="absolute inset-0 w-full h-full opacity-20 pointer-events-none" viewBox="0 0 320 170" fill="none">
+            <circle cx="265" cy="85" r="72" stroke="white" stroke-width="1.2"/>
+            <circle cx="265" cy="85" r="52" stroke="white" stroke-width="1.2" stroke-dasharray="4 4"/>
+            <circle cx="195" cy="28" r="7" stroke="white" stroke-width="1.5"/>
+          </svg>`;
+      }
+      if (type === 'orbit') {
+        return `
+          <svg class="absolute inset-0 w-full h-full opacity-20 pointer-events-none" viewBox="0 0 320 170" fill="none">
+            <ellipse cx="160" cy="85" rx="145" ry="52" stroke="white" stroke-width="1.2"/>
+            <circle cx="285" cy="48" r="14" stroke="white" stroke-width="1.5"/>
+            <circle cx="38" cy="122" r="10" stroke="white" stroke-width="1.5"/>
+          </svg>`;
+      }
+      if (type === 'waves') {
+        return `
+          <svg class="absolute inset-0 w-full h-full opacity-20 pointer-events-none" viewBox="0 0 320 170" fill="none">
+            <path d="M-20 120C60 75 130 155 210 105C265 70 305 90 340 75" stroke="white" stroke-width="2"/>
+            <path d="M-20 145C60 100 130 180 210 130C265 95 305 115 340 100" stroke="white" stroke-width="1.2"/>
+          </svg>`;
+      }
+      return `
+        <svg class="absolute inset-0 w-full h-full opacity-20 pointer-events-none" viewBox="0 0 320 170" fill="none">
+          <circle cx="52" cy="36" r="14" stroke="white" stroke-width="1.5"/>
+          <circle cx="272" cy="132" r="22" stroke="white" stroke-width="1.5"/>
+          <line x1="64" y1="44" x2="252" y2="124" stroke="white" stroke-width="1" stroke-dasharray="3 3"/>
+        </svg>`;
+    }
+
+    /**
+     * Render 5 crisp yellow stars matching the reference sample
+     */
+    function renderStars() {
+      const starSvg = `
+        <svg class="w-3.5 h-3.5 text-amber-400 fill-current shrink-0" viewBox="0 0 20 20" aria-hidden="true">
+          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+        </svg>`;
+      return `<div class="flex items-center gap-0.5" aria-label="5 out of 5 priority stars">${starSvg.repeat(5)}</div>`;
+    }
+
+    /**
+     * Render the 6 cards into the 4-column grid with designated bank accounts & live balances
+     */
+    function renderCards() {
+      const summary = updateDashboardSummary();
+      const grid = document.getElementById('planGrid');
+
+      grid.innerHTML = FINANCIAL_PILLARS.map((pillar) => {
+        const isCalcMode = displayMode === 'calculator';
+        const targetNaira =
+          pillar.percentage !== null ? formatNaira((monthlySalary * pillar.percentage) / 100) : 'Ring-Fenced';
+        const pStats = summary.statsByPillar[pillar.id] || { totalIn: 0, totalOut: 0, balance: 0 };
+        const utilizationPct =
+          pStats.totalIn > 0 ? Math.min(100, Math.round((pStats.totalOut / pStats.totalIn) * 100)) : 0;
+
+        return `
+          <article
+            onclick="openModal('${pillar.id}')"
+            tabindex="0"
+            role="button"
+            aria-label="Open details for ${pillar.cardTitle}"
+            onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openModal('${pillar.id}');}"
+            class="group bg-white rounded-xl border border-slate-200/90 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-200 overflow-hidden flex flex-col cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-600"
+          >
+            <!-- Top Blue Gradient Banner Header -->
+            <div class="${pillar.bannerClass} relative h-44 px-5 py-4 flex flex-col items-center justify-center text-center text-white overflow-hidden">
+              ${getBannerSvg(pillar.svgPattern)}
+              
+              <!-- Top Kicker Label -->
+              <span class="relative z-10 text-[10px] font-semibold tracking-[0.12em] uppercase text-blue-100/90 mb-1.5">
+                ${pillar.kicker}
+              </span>
+
+              <!-- Bold White Pillar Title -->
+              <h2 class="relative z-10 font-display font-bold text-lg leading-snug text-white max-w-[235px]">
+                ${pillar.bannerTitle}
+              </h2>
+
+              <!-- Prominent Percentage Badge (and dynamic Naira pill when in Calculator mode) -->
+              <div class="relative z-10 mt-2 flex items-center justify-center gap-2 flex-wrap">
+                <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-extrabold tracking-tight bg-white/18 backdrop-blur-xs border border-white/25 text-white shadow-xs">
+                  ${pillar.badgeText}
+                </span>
+                ${
+                  isCalcMode
+                    ? `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-400/20 border border-emerald-200/40 text-emerald-100">
+                        ${targetNaira}
+                      </span>`
+                    : ''
+                }
+              </div>
+
+              <!-- Designated Bank Account Pill with One-Click Copy -->
+              <div
+                onclick="copyAccountNumber(event, '${pillar.accountNumber}', '${pillar.bankName}')"
+                title="Click to copy account number"
+                class="relative z-10 mt-2.5 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-black/25 hover:bg-black/40 border border-white/15 text-[11px] font-semibold text-blue-50 transition-colors"
+              >
+                <span class="font-mono tracking-wide">${pillar.accountNumber}</span>
+                <span class="opacity-60">&bull;</span>
+                <span>${pillar.bankName}</span>
+                <svg class="w-3 h-3 text-blue-200 ml-0.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Lower Clean White Section -->
+            <div class="p-4 sm:p-5 flex-1 flex flex-col justify-between bg-white">
+              <div>
+                <!-- Pillar Title in Bold Dark Text -->
+                <div class="flex items-start justify-between gap-2">
+                  <h3 class="font-bold text-[15px] text-slate-900 group-hover:text-blue-700 transition-colors leading-snug">
+                    ${pillar.cardTitle}
+                  </h3>
+                  <button
+                    type="button"
+                    onclick="event.stopPropagation(); openTransactionModal('${pillar.id}')"
+                    title="Log transaction for ${pillar.cardTitle}"
+                    class="shrink-0 px-2 py-0.5 text-[11px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors cursor-pointer"
+                  >
+                    + Log
+                  </button>
+                </div>
+
+                <!-- Strategy / Rule Subtitle -->
+                <p class="mt-1 text-xs font-medium text-slate-500 leading-relaxed">
+                  ${pillar.subtitle}
+                </p>
+
+                <!-- 5-Star Visual Priority/Discipline Indicator -->
+                <div class="mt-2.5 flex items-center gap-1.5">
+                  <span class="text-xs font-bold text-slate-800">${pillar.rating}</span>
+                  ${renderStars()}
+                  <span class="text-xs text-slate-400 font-medium">${pillar.priorityTag}</span>
+                </div>
+
+                <!-- Live Account Ledger Mini-Summary -->
+                <div class="mt-3.5 pt-3 border-t border-slate-100 space-y-1.5 text-xs">
+                  <div class="flex items-center justify-between">
+                    <span class="text-slate-400 font-medium">Allocated In:</span>
+                    <span class="font-bold text-slate-800">${formatNaira(pStats.totalIn)}</span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-slate-400 font-medium">Spent / Out:</span>
+                    <span class="font-semibold text-rose-600">${formatNaira(pStats.totalOut)}</span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-slate-500 font-semibold">Balance:</span>
+                    <span class="font-extrabold ${pStats.balance >= 0 ? 'text-emerald-700' : 'text-rose-600'}">
+                      ${formatNaira(pStats.balance)}
+                    </span>
+                  </div>
+                  <!-- Subtle Utilization Progress Bar -->
+                  <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden mt-1">
+                    <div
+                      class="h-full ${utilizationPct > 90 ? 'bg-rose-500' : 'bg-blue-600'} rounded-full transition-all"
+                      style="width: ${utilizationPct}%"
+                    ></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Concise Action Metric / Target Note at Bottom -->
+              <div class="mt-3.5 pt-2.5 border-t border-slate-100 flex items-center justify-between gap-2">
+                <p class="text-[11px] text-slate-500 font-medium leading-snug">
+                  ${pillar.bottomNote}
+                </p>
+                <span class="text-slate-300 group-hover:text-blue-600 transition-colors shrink-0" aria-hidden="true">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    /**
+     * Render the Transaction History & Receipt Ledger Table
+     */
+    function renderLedger() {
+      const tbody = document.getElementById('ledgerTableBody');
+      const emptyState = document.getElementById('ledgerEmptyState');
+      const searchQuery = (document.getElementById('ledgerSearch').value || '').toLowerCase().trim();
+      const filterPillar = document.getElementById('ledgerFilterPillar').value;
+      const filterType = document.getElementById('ledgerFilterType').value;
+
+      const filtered = transactions.filter((tx) => {
+        if (filterPillar !== 'all' && tx.pillarId !== filterPillar) return false;
+        if (filterType !== 'all' && tx.direction !== filterType) return false;
+        if (searchQuery) {
+          const pillar = FINANCIAL_PILLARS.find((p) => p.id === tx.pillarId);
+          const haystack = `${tx.note} ${tx.date} ${pillar ? pillar.cardTitle + ' ' + pillar.bankName + ' ' + pillar.accountNumber : ''}`.toLowerCase();
+          if (!haystack.includes(searchQuery)) return false;
+        }
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+      }
+
+      emptyState.classList.add('hidden');
+      tbody.innerHTML = filtered
+        .map((tx) => {
+          const pillar = FINANCIAL_PILLARS.find((p) => p.id === tx.pillarId) || FINANCIAL_PILLARS[0];
+          const isInflow = tx.direction === 'inflow';
+
+          const receiptCell =
+            tx.receipt && tx.receipt.dataUrl
+              ? `<button
+                  type="button"
+                  onclick="openReceiptLightbox('${tx.id}')"
+                  class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold transition-colors cursor-pointer"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                  View Receipt
+                </button>`
+              : `<button
+                  type="button"
+                  onclick="triggerQuickAttachReceipt('${tx.id}')"
+                  class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold transition-colors cursor-pointer"
+                >
+                  + Attach
+                </button>`;
+
+          return `
+            <tr class="hover:bg-slate-50/70 transition-colors">
+              <td class="py-3.5 px-4 sm:px-6 text-xs font-semibold text-slate-600 whitespace-nowrap">${tx.date}</td>
+              <td class="py-3.5 px-4">
+                <div class="font-bold text-xs sm:text-sm text-slate-900">${pillar.cardTitle}</div>
+                <div class="text-[11px] font-mono text-slate-500">${pillar.accountNumber} &bull; ${pillar.bankName}</div>
+              </td>
+              <td class="py-3.5 px-4 text-xs sm:text-sm text-slate-700 max-w-xs">
+                ${tx.note}
+                ${
+                  tx.isSalarySplit
+                    ? `<span class="ml-1.5 inline-block px-1.5 py-0.5 text-[10px] font-bold bg-indigo-50 text-indigo-700 rounded">Formula A Split</span>`
+                    : ''
+                }
+              </td>
+              <td class="py-3.5 px-4 whitespace-nowrap">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
+                  isInflow ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/70' : 'bg-rose-50 text-rose-700 border border-rose-200/70'
+                }">
+                  ${isInflow ? 'Inflow (+)' : 'Outflow (-)'}
+                </span>
+              </td>
+              <td class="py-3.5 px-4 text-right font-extrabold text-xs sm:text-sm whitespace-nowrap ${
+                isInflow ? 'text-emerald-700' : 'text-rose-600'
+              }">
+                ${isInflow ? '+' : '-'}${formatNaira(tx.amount)}
+              </td>
+              <td class="py-3.5 px-4 text-center whitespace-nowrap">
+                ${receiptCell}
+              </td>
+              <td class="py-3.5 px-4 sm:px-6 text-right whitespace-nowrap">
+                <button
+                  type="button"
+                  onclick="deleteTransaction('${tx.id}')"
+                  title="Delete transaction"
+                  class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          `;
+        })
+        .join('');
+    }
+
+    /**
+     * Switch between '% View Only' and '₦ + % Calculator View'
+     */
+    function setDisplayMode(mode) {
+      displayMode = mode;
+      const btnPercent = document.getElementById('btnModePercent');
+      const btnCalc = document.getElementById('btnModeCalculator');
+      const calcBar = document.getElementById('calculatorInputBar');
+
+      if (mode === 'percent') {
+        btnPercent.className =
+          'px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all bg-white text-slate-900 shadow-xs cursor-pointer';
+        btnCalc.className =
+          'px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all text-slate-600 hover:text-slate-900 cursor-pointer';
+        calcBar.classList.add('hidden');
+        calcBar.classList.remove('flex');
+      } else {
+        btnCalc.className =
+          'px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all bg-white text-slate-900 shadow-xs cursor-pointer';
+        btnPercent.className =
+          'px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all text-slate-600 hover:text-slate-900 cursor-pointer';
+        calcBar.classList.remove('hidden');
+        calcBar.classList.add('flex');
+      }
+
+      renderCards();
+      if (activePillarId) {
+        updateModalNaira(activePillarId);
+      }
+    }
+
+    /**
+     * Update Naira readout inside modal if open
+     */
+    function updateModalNaira(pillarId) {
+      const pillar = FINANCIAL_PILLARS.find((p) => p.id === pillarId);
+      const nairaLine = document.getElementById('modalNairaLine');
+      const nairaAmountEl = document.getElementById('modalNairaAmount');
+
+      if (!pillar) return;
+
+      if (displayMode === 'calculator') {
+        nairaLine.classList.remove('hidden');
+        if (pillar.percentage !== null) {
+          nairaAmountEl.textContent = formatNaira((monthlySalary * pillar.percentage) / 100);
+        } else {
+          nairaAmountEl.textContent = '100% Retained in Opay (08167676839)';
+        }
+      } else {
+        nairaLine.classList.add('hidden');
+      }
+    }
+
+    /**
+     * Open detail modal for a selected pillar
+     */
+    function openModal(pillarId) {
+      const pillar = FINANCIAL_PILLARS.find((p) => p.id === pillarId);
+      if (!pillar) return;
+
+      activePillarId = pillarId;
+      const summary = computeFinancialSummary();
+      const pStats = summary.statsByPillar[pillarId] || { totalIn: 0, totalOut: 0, balance: 0 };
+
+      const modal = document.getElementById('detailModal');
+      const panel = document.getElementById('modalPanel');
+      const banner = document.getElementById('modalBanner');
+
+      banner.className = `${pillar.bannerClass} px-6 py-6 text-white relative`;
+      document.getElementById('modalKicker').textContent = pillar.kicker;
+      document.getElementById('modalTitle').textContent = pillar.cardTitle;
+      document.getElementById('modalBadge').textContent = pillar.badgeText;
+      document.getElementById('modalBankDetails').textContent = `${pillar.accountNumber} • ${pillar.bankName}`;
+      document.getElementById('modalCopyBtn').onclick = (e) =>
+        copyAccountNumber(e, pillar.accountNumber, pillar.bankName);
+
+      document.getElementById('modalStatIn').textContent = formatNaira(pStats.totalIn);
+      document.getElementById('modalStatOut').textContent = formatNaira(pStats.totalOut);
+      document.getElementById('modalStatBal').textContent = formatNaira(pStats.balance);
+
+      document.getElementById('modalSubtitle').textContent = pillar.subtitle;
+      document.getElementById('modalDescription').textContent = pillar.description;
+
+      updateModalNaira(pillarId);
+
+      const rulesList = document.getElementById('modalRulesList');
+      rulesList.innerHTML = pillar.rules
+        .map(
+          (rule) => `
+          <li class="flex items-start gap-2.5">
+            <span class="mt-0.5 w-4 h-4 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
+              <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </span>
+            <span>${rule}</span>
+          </li>`
+        )
+        .join('');
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+
+      requestAnimationFrame(() => {
+        modal.classList.remove('opacity-0');
+        panel.classList.remove('scale-95', 'opacity-0');
+        panel.classList.add('scale-100', 'opacity-100');
+      });
+    }
+
+    /**
+     * Close detail modal
+     */
+    function closeModal() {
+      const modal = document.getElementById('detailModal');
+      const panel = document.getElementById('modalPanel');
+
+      modal.classList.add('opacity-0');
+      panel.classList.remove('scale-100', 'opacity-100');
+      panel.classList.add('scale-95', 'opacity-0');
+
+      setTimeout(() => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        activePillarId = null;
+      }, 200);
+    }
+
+    function logForActivePillar() {
+      const targetId = activePillarId;
+      closeModal();
+      setTimeout(() => openTransactionModal(targetId), 210);
+    }
+
+    /**
+     * Transaction Recording Modal Controls
+     */
+    function openTransactionModal(preselectedPillarId = null) {
+      const modal = document.getElementById('transactionModal');
+      const dateInput = document.getElementById('txDate');
+      dateInput.value = new Date().toISOString().split('T')[0];
+
+      document.getElementById('txAmount').value = '';
+      document.getElementById('txNote').value = '';
+      clearReceiptSelection();
+
+      if (preselectedPillarId) {
+        document.getElementById('txType').value = 'expense';
+        document.getElementById('txPillarId').value = preselectedPillarId;
+      } else {
+        document.getElementById('txType').value = 'salary_split';
+      }
+
+      handleTxTypeChange();
+      updateSplitPreview();
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeTransactionModal() {
+      const modal = document.getElementById('transactionModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function handleTxTypeChange() {
+      const txType = document.getElementById('txType').value;
+      const accountGroup = document.getElementById('txAccountGroup');
+      const splitPreview = document.getElementById('salarySplitPreview');
+
+      if (txType === 'salary_split') {
+        accountGroup.classList.add('hidden');
+        splitPreview.classList.remove('hidden');
+        updateSplitPreview();
+      } else {
+        accountGroup.classList.remove('hidden');
+        splitPreview.classList.add('hidden');
+      }
+    }
+
+    function handleTxAmountInput(inputEl) {
+      const raw = inputEl.value.replace(/[^0-9]/g, '');
+      const num = raw ? parseInt(raw, 10) : 0;
+      inputEl.value = num > 0 ? num.toLocaleString('en-NG') : '';
+      updateSplitPreview();
+    }
+
+    function updateSplitPreview() {
+      const raw = document.getElementById('txAmount').value.replace(/[^0-9]/g, '');
+      const amount = raw ? parseInt(raw, 10) : 0;
+      const salaryPillars = FINANCIAL_PILLARS.filter((p) => p.percentage !== null);
+
+      document.getElementById('splitPreviewList').innerHTML = salaryPillars
+        .map((p) => {
+          const share = (amount * p.percentage) / 100;
+          return `
+            <div class="flex items-center justify-between bg-white px-2.5 py-1.5 rounded-lg border border-blue-100">
+              <span class="truncate pr-1">${p.cardTitle.split(' ')[0]} (${p.percentage}%):</span>
+              <span class="font-bold text-slate-900 shrink-0">${formatNaira(share)}</span>
+            </div>`;
+        })
+        .join('');
+    }
+
+    /**
+     * Receipt File Reader (Base64 conversion with 3MB limit)
+     */
+    function readFileAsBase64(file, callback) {
+      if (!file) return;
+      if (file.size > 3 * 1024 * 1024) {
+        showToast('File exceeds 3MB limit. Please upload a smaller image or PDF.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        callback({
+          name: file.name,
+          type: file.type,
+          dataUrl: reader.result,
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function handleReceiptFileSelect(event) {
+      const file = event.target.files[0];
+      readFileAsBase64(file, (receiptObj) => {
+        pendingReceiptData = receiptObj;
+        document.getElementById('receiptPlaceholder').classList.add('hidden');
+        const previewBox = document.getElementById('receiptPreviewBox');
+        previewBox.classList.remove('hidden');
+        previewBox.classList.add('flex');
+        document.getElementById('receiptFileName').textContent = receiptObj.name;
+
+        const thumbImg = document.getElementById('receiptThumbImg');
+        const pdfBadge = document.getElementById('receiptPdfBadge');
+        if (receiptObj.type === 'application/pdf') {
+          thumbImg.classList.add('hidden');
+          pdfBadge.classList.remove('hidden');
+          pdfBadge.classList.add('flex');
+        } else {
+          pdfBadge.classList.add('hidden');
+          pdfBadge.classList.remove('flex');
+          thumbImg.src = receiptObj.dataUrl;
+          thumbImg.classList.remove('hidden');
+        }
+      });
+    }
+
+    function clearReceiptSelection(event) {
+      if (event) event.stopPropagation();
+      pendingReceiptData = null;
+      document.getElementById('txReceiptFile').value = '';
+      document.getElementById('receiptPlaceholder').classList.remove('hidden');
+      const previewBox = document.getElementById('receiptPreviewBox');
+      previewBox.classList.add('hidden');
+      previewBox.classList.remove('flex');
+    }
+
+    /**
+     * Save Transaction Form Submission
+     */
+    function handleTransactionSubmit(event) {
+      event.preventDefault();
+      const txType = document.getElementById('txType').value;
+      const date = document.getElementById('txDate').value;
+      const rawAmount = document.getElementById('txAmount').value.replace(/[^0-9]/g, '');
+      const amount = rawAmount ? parseInt(rawAmount, 10) : 0;
+      const note = document.getElementById('txNote').value.trim();
+
+      if (amount <= 0) {
+        showToast('Please enter a valid Naira amount greater than 0.');
+        return;
+      }
+
+      if (txType === 'salary_split') {
+        const batchId = 'batch_' + Date.now();
+        const salaryPillars = FINANCIAL_PILLARS.filter((p) => p.percentage !== null);
+
+        // Create 5 linked inflows across the 5 designated salary accounts
+        salaryPillars.reverse().forEach((pillar, idx) => {
+          const shareAmount = Math.round((amount * pillar.percentage) / 100);
+          transactions.unshift({
+            id: 'tx_' + Date.now() + '_' + idx,
+            date,
+            pillarId: pillar.id,
+            direction: 'inflow',
+            amount: shareAmount,
+            note: `${note} (${pillar.percentage}% Formula A Split)`,
+            isSalarySplit: true,
+            batchId,
+            batchTotalSalary: amount,
+            receipt: pendingReceiptData ? { ...pendingReceiptData } : null,
+          });
+        });
+        showToast(`Salary of ${formatNaira(amount)} auto-split across 5 accounts!`);
+      } else {
+        const pillarId = document.getElementById('txPillarId').value;
+        transactions.unshift({
+          id: 'tx_' + Date.now(),
+          date,
+          pillarId,
+          direction: txType === 'deposit' ? 'inflow' : 'expense',
+          amount,
+          note,
+          isSalarySplit: false,
+          receipt: pendingReceiptData ? { ...pendingReceiptData } : null,
+        });
+        showToast('Transaction recorded successfully.');
+      }
+
+      saveTransactions();
+      renderCards();
+      renderLedger();
+      closeTransactionModal();
+    }
+
+    /**
+     * Quick-attach receipt to an existing row in the ledger
+     */
+    function triggerQuickAttachReceipt(txId) {
+      quickAttachTxId = txId;
+      const input = document.getElementById('quickAttachReceiptInput');
+      input.value = '';
+      input.click();
+    }
+
+    function handleQuickAttachReceipt(event) {
+      const file = event.target.files[0];
+      if (!file || !quickAttachTxId) return;
+      readFileAsBase64(file, (receiptObj) => {
+        const tx = transactions.find((t) => t.id === quickAttachTxId);
+        if (tx) {
+          tx.receipt = receiptObj;
+          saveTransactions();
+          renderCards();
+          renderLedger();
+          showToast('Receipt attached to transaction.');
+        }
+        quickAttachTxId = null;
+      });
+    }
+
+    /**
+     * Receipt Lightbox Modal
+     */
+    function openReceiptLightbox(txId) {
+      const tx = transactions.find((t) => t.id === txId);
+      if (!tx || !tx.receipt) return;
+
+      const pillar = FINANCIAL_PILLARS.find((p) => p.id === tx.pillarId);
+      document.getElementById('lightboxTitle').textContent = tx.receipt.name || 'Payment Receipt';
+      document.getElementById('lightboxSubtitle').textContent = `${tx.date} • ${pillar ? pillar.cardTitle : ''} • ${formatNaira(tx.amount)}`;
+
+      const dlBtn = document.getElementById('lightboxDownloadBtn');
+      dlBtn.href = tx.receipt.dataUrl;
+      dlBtn.download = tx.receipt.name || 'receipt';
+
+      const imgEl = document.getElementById('lightboxImg');
+      const pdfEl = document.getElementById('lightboxPdf');
+
+      if (tx.receipt.type === 'application/pdf') {
+        imgEl.classList.add('hidden');
+        pdfEl.src = tx.receipt.dataUrl;
+        pdfEl.classList.remove('hidden');
+      } else {
+        pdfEl.classList.add('hidden');
+        imgEl.src = tx.receipt.dataUrl;
+        imgEl.classList.remove('hidden');
+      }
+
+      const modal = document.getElementById('receiptLightboxModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeReceiptLightbox() {
+      const modal = document.getElementById('receiptLightboxModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    /**
+     * Delete single transaction
+     */
+    function deleteTransaction(txId) {
+      transactions = transactions.filter((t) => t.id !== txId);
+      saveTransactions();
+      renderCards();
+      renderLedger();
+      showToast('Transaction removed.');
+    }
+
+    /**
+     * Clear all data confirmation modal
+     */
+    function confirmClearData() {
+      const modal = document.getElementById('confirmClearModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeClearModal() {
+      const modal = document.getElementById('confirmClearModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function executeClearData() {
+      transactions = [];
+      saveTransactions();
+      renderCards();
+      renderLedger();
+      closeClearModal();
+      showToast('All transaction records cleared.');
+    }
+
+    /**
+     * Export Ledger to CSV
+     */
+    function exportLedgerCSV() {
+      if (transactions.length === 0) {
+        showToast('No transactions available to export.');
+        return;
+      }
+      const headers = ['Date', 'Pillar', 'Bank Name', 'Account Number', 'Type', 'Amount (NGN)', 'Description', 'Receipt Attached'];
+      const rows = transactions.map((tx) => {
+        const p = FINANCIAL_PILLARS.find((item) => item.id === tx.pillarId) || {};
+        return [
+          tx.date,
+          `"${p.cardTitle || ''}"`,
+          `"${p.bankName || ''}"`,
+          `"\t${p.accountNumber || ''}"`,
+          tx.direction === 'inflow' ? 'Inflow' : 'Outflow',
+          tx.amount,
+          `"${(tx.note || '').replace(/"/g, '""')}"`,
+          tx.receipt ? 'Yes' : 'No',
+        ].join(',');
+      });
+
+      const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows].join('\n');
+      const link = document.createElement('a');
+      link.setAttribute('href', encodeURI(csvContent));
+      link.setAttribute('download', `formula_a_ledger_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast('CSV ledger exported.');
+    }
+
+    // Handle salary input formatting & live recalculation
+    document.getElementById('salaryInput').addEventListener('input', (e) => {
+      const rawDigits = e.target.value.replace(/[^0-9]/g, '');
+      const numericValue = rawDigits ? parseInt(rawDigits, 10) : 0;
+      monthlySalary = numericValue;
+      e.target.value = numericValue > 0 ? numericValue.toLocaleString('en-NG') : '';
+      renderCards();
+      if (activePillarId) {
+        updateModalNaira(activePillarId);
+      }
+    });
+
+    // Backdrop & Escape key listeners
+    document.getElementById('detailModal').addEventListener('click', (e) => {
+      if (e.target.id === 'detailModal') closeModal();
+    });
+    document.getElementById('transactionModal').addEventListener('click', (e) => {
+      if (e.target.id === 'transactionModal') closeTransactionModal();
+    });
+    document.getElementById('receiptLightboxModal').addEventListener('click', (e) => {
+      if (e.target.id === 'receiptLightboxModal') closeReceiptLightbox();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (activePillarId) closeModal();
+        closeTransactionModal();
+        closeReceiptLightbox();
+        closeClearModal();
+      }
+    });
+
+    // Initial render
+    window.addEventListener('DOMContentLoaded', () => {
+      loadTransactions();
+      renderCards();
+      renderLedger();
+    });
+  </script>
+</body>
+</html>
